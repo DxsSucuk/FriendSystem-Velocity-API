@@ -1,7 +1,5 @@
 package me.sk8ingduck.friendsystem;
 
-import me.sk8ingduck.friendsystem.command.TestFriend;
-import me.sk8ingduck.friendsystem.command.TestParty;
 import me.sk8ingduck.friendsystem.config.DBConfig;
 import me.sk8ingduck.friendsystem.manager.FriendManager;
 import me.sk8ingduck.friendsystem.manager.PartyManager;
@@ -28,8 +26,8 @@ public final class SpigotAPI extends JavaPlugin {
 
 		getServer().getMessenger().registerOutgoingPluginChannel(this, CHANNEL);
 
-		getCommand("testparty").setExecutor(new TestParty());
-		getCommand("testfriend").setExecutor(new TestFriend());
+		//getCommand("testparty").setExecutor(new TestParty());
+		//getCommand("testfriend").setExecutor(new TestFriend());
 	}
 
 	@Override
