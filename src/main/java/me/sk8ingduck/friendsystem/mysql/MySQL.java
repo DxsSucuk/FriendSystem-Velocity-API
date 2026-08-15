@@ -25,6 +25,7 @@ public class MySQL {
 		config.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true");
 		config.setUsername(username);
 		config.setPassword(password);
+		config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 		config.addDataSourceProperty("cachePrepStmts", "true");
 		config.addDataSourceProperty("prepStmtCacheSize", "250");
 		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

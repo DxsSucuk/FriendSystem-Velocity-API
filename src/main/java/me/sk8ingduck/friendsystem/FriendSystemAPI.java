@@ -1,7 +1,6 @@
 package me.sk8ingduck.friendsystem;
 
 import com.google.inject.Inject;
-import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
@@ -24,7 +23,7 @@ public final class FriendSystemAPI {
 	private MySQL mysql;
 
 	@Inject
-	public FriendSystemAPI(EventManager eventManager, Logger logger, @DataDirectory Path dataDirectory) {
+	public FriendSystemAPI(Logger logger, @DataDirectory Path dataDirectory) {
 		instance = this;
 
 		DBConfig db = new DBConfig("database.yml", dataDirectory.getParent().resolve("FriendSystem"));
@@ -33,7 +32,6 @@ public final class FriendSystemAPI {
 		friendManager = new FriendManager(mysql);
 		partyManager = new PartyManager(mysql);
 
-		eventManager.register(this, this);
 		logger.info("FriendSystem-Velocity-API enabled.");
 	}
 
