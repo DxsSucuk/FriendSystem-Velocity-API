@@ -1,6 +1,6 @@
 package me.sk8ingduck.friendsystem.config;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class DBConfig extends Config {
 
@@ -10,7 +10,7 @@ public class DBConfig extends Config {
     private final String password;
     private final String database;
 
-    public DBConfig(String name, File path) {
+    public DBConfig(String name, Path path) {
         super(name, path);
 
         this.host = (String) getPathOrSet("mysql.host", "localhost");

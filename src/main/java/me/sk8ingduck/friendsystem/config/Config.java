@@ -1,61 +1,84 @@
 package me.sk8ingduck.friendsystem.config;
 
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Config {
 
-	private final File file;
-	private final FileConfiguration fileConfiguration;
+	private final Path file;
+	private final Map<String, Object> data;
 
-	public Config(String name, File path) {
-		file = new File(path, name);
+	public Config(String name, Path path) {
+		file = path.resolve(name);
 
-		if (!file.exists()) {
-			path.mkdir();
+		if (!Files.exists(file)) {
 			try {
-				file.createNewFile();
+				Files.createDirectories(path);
+				Files.createFile(file);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		fileConfiguration = new YamlConfiguration();
 
-		try {
-			fileConfiguration.load(file);
-		} catch (IOException | InvalidConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-
-	protected File getFile() {
-		return file;
-	}
-
-	protected FileConfiguration getFileConfiguration() {
-		return fileConfiguration;
-	}
-
-	protected void save() {
-		try {
-			fileConfiguration.save(file);
+		try (InputStream in = Files.newInputStream(file)) {
+			Map<String, Object> loaded = new Yaml().load(in);
+			data = loaded != null ? loaded : new HashMap<>();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public Object getPathOrSet(String path, Object defaultValue) {
-		if (fileConfiguration.get(path) == null) {
-			fileConfiguration.set(path, defaultValue);
-			save();
-		}
+	protected Path getFile() {
+		return file;
+	}
 
-		return fileConfiguration.get(path);
+	public Object getPathOrSet(String path, Object defaultValue) {
+		Object value = get(path);
+		if (value == null) {
+			set(path, defaultValue);
+			save();
+			return defaultValue;
+		}
+		return value;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Object get(String path) {
+		Map<String, Object> current = data;
+		String[] keys = path.split("\\.");
+		for (int i = 0; i < keys.length - 1; i++) {
+			Object next = current.get(keys[i]);
+			if (!(next instanceof Map)) {
+				return null;
+			}
+			current = (Map<String, Object>) next;
+		}
+		return current.get(keys[keys.length - 1]);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void set(String path, Object value) {
+		Map<String, Object> current = data;
+		String[] keys = path.split("\\.");
+		for (int i = 0; i < keys.length - 1; i++) {
+			current = (Map<String, Object>) current.computeIfAbsent(keys[i], k -> new HashMap<String, Object>());
+		}
+		current.put(keys[keys.length - 1], value);
+	}
+
+	private void save() {
+		try (Writer writer = Files.newBufferedWriter(file)) {
+			new Yaml().dump(data, writer);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
